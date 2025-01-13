@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    metrics_path: /metrics
+    static_configs:
+      - targets: [ "localhost:8080" ]
+    fallback_scrape_protocol: PrometheusText0.0.4
+    # metric_relabel_configs:
+    #   - source_labels: [ __name__ ]
+    #     regex: 'scaph_process_.*'
+    #     action: drop
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        action: keep
+        regex: '(scaph_host_power_microwatts|scaph_host_energy_microjoules)'
