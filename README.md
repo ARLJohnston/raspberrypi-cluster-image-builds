@@ -18,3 +18,8 @@ github:matthewcroughan/raspberrypi-nixos-example`
 
 Simply fork this repo and begin adding code to `./configuration.nix` and allow
 this basic configuration to become your own.
+
+To flash
+```
+sudo dd if=./result/image.raw of=<device> status=progress bs=4M conv=noerror,fsync
+```
