@@ -7,6 +7,12 @@
     images = {
       pi4_worker = self.nixosConfigurations.pi4_worker.config.system.build.image;
       pi4_supervisor = self.nixosConfigurations.pi4_supervisor.config.system.build.image;
+
+      docker_worker = self.nixosConfigurations.docker_worker.config.system.build.image;
+      docker_supervisor = self.nixosConfigurations.docker_supervisor.config.system.build.image;
+
+      kubernetes_worker = self.nixosConfigurations.kubernetes_worker.config.system.build.image;
+      kubernetes_supervisor = self.nixosConfigurations.kubernetes_supervisor.config.system.build.image;
     };
 
 
@@ -19,36 +25,36 @@
           "${nixpkgs}/nixos/modules/profiles/minimal.nix"
           ./configuration.nix
         ];
- 	 	};
+      };
 
       pi4_supervisor = self.nixosConfigurations.pi4_worker.extendModules {
-				modules = [
-			    ./supervisor.nix
-				];
+        modules = [
+          ./supervisor.nix
+        ];
       };
 
       docker_worker = self.nixosConfigurations.pi4_worker.extendModules {
-				modules = [
-			    ./docker.nix
-				];
+        modules = [
+          ./docker.nix
+        ];
       };
 
       docker_supervisor = self.nixosConfigurations.pi4_supervisor.extendModules {
-				modules = [
-			    ./docker.nix
-				];
+        modules = [
+          ./docker.nix
+        ];
       };
 
       kubernetes_worker = self.nixosConfigurations.pi4_worker.extendModules {
-				modules = [
-			    ./kubernetes_worker.nix
-				];
+        modules = [
+          ./kubernetes_worker.nix
+        ];
       };
 
       kubernetes_supervisor = self.nixosConfigurations.pi4_supervisor.extendModules {
-				modules = [
-			    ./kubernetes_supervisor.nix
-				];
+        modules = [
+          ./kubernetes_supervisor.nix
+        ];
       };
     };
   };
