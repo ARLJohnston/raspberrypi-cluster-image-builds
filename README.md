@@ -9,17 +9,22 @@ NixOS configuration.
 }
 ```
 
-Then you will be able to run `nix build .#images.pi4` and get a result you can
-flash to an SD Card and boot.
+### Pi3 builds
+Pi3 builds mostly follow [this blog post](https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html).
 
-After you've booted, you will be able to rebuild the nixosConfiguration on the
-Pi. For example, by running `nixos-rebuild --flake
-github:matthewcroughan/raspberrypi-nixos-example`
+Current targets:
+| pi3               | base image, boots with ssh |
+| pi3_docker_worker | base with docker installed |
 
-Simply fork this repo and begin adding code to `./configuration.nix` and allow
-this basic configuration to become your own.
 
-To flash
+To build:
+```shell
+nix build .#nixosConfigurations.<target>.config.system.build.sdImage
 ```
-sudo dd if=./result/image.raw of=<device> status=progress bs=4M conv=noerror,fsync
+
+### Flashing
+```shell
+sudo dd if=./result/<image> of=<device> status=progress bs=4M conv=noerror,fsync
 ```
+
+Alternatively, ensure the image has a supported extension and use [Rasberry Pi Imager](https://github.com/raspberrypi/rpi-imager) to flash

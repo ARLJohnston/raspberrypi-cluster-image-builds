@@ -1,9 +1,5 @@
 { pkgs, lib, ... }:
 {
-  imports = [
-    ./repart.nix
-  ];
-  boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
   environment.systemPackages = with pkgs; [ git lsof];
 
   networking.hostName = "pi";
@@ -15,6 +11,7 @@
       openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDvI8WT1wVlTtqheO4pS0zOInO9Da4V3BGeTOlTviCJx" ];
     };
     users.root.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDvI8WT1wVlTtqheO4pS0zOInO9Da4V3BGeTOlTviCJx" ];
+    users.root.initialHashedPassword = "";
   };
   services.getty.autologinUser = "pi";
 
@@ -24,23 +21,15 @@
   };
 
   networking = {
-    usePredictableInterfaceNames = false; # As the Pi4 only has 1×wlan and 1×eth 'unpredictable' order has no effect
+    usePredictableInterfaceNames = false; # As the Pi3 only has 1×wlan and 1×eth 'unpredictable' order has no effect
 
     interfaces."eth0" = {
       useDHCP = false;
       ipv4.addresses = [{
-		    address = "10.0.0.40"; # Need to replace during build
+        address = "10.0.0.20"; # Need to replace during build
         prefixLength = 24;
-		  }];
+      }];
       ipv6.addresses = [];
-    };
-    interfaces."wlan0".useDHCP = true;
-
-    wireless = {
-      enable = true;
-      networks."Raspberry Pi Mirror" = {
-				psk = "q`R0Z[l,Dt80F$hJ'38;Nhgk[!^[]_gb";
-      };
     };
   };
 
