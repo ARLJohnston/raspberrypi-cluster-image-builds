@@ -1,6 +1,6 @@
 { pkgs, lib, ... }:
 {
-  environment.systemPackages = with pkgs; [ git lsof];
+  environment.systemPackages = with pkgs; [ git lsof networkmanager];
 
   networking.hostName = "pi";
   users = {
@@ -30,6 +30,15 @@
         prefixLength = 24;
       }];
       ipv6.addresses = [];
+    };
+
+    interfaces."wlan0".useDHCP = true;
+
+    wireless = {
+      enable = true;
+      networks."Raspberry Pi Mirror" = {
+        psk = "q`R0Z[l,Dt80F$hJ'38;Nhgk[!^[]_gb";
+      };
     };
   };
 
