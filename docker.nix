@@ -3,11 +3,8 @@
   virtualisation = {
     containers.enable = true;
     docker = {
-      rootless = {
         enable = true;
-        setSocketVariable = true;
+        daemon.settings = {metrics-addr = "0.0.0.0:9323"; experimental = true; }; # https://prometheus.io/docs/guides/dockerswarm/
       };
-      storageDriver = "ext4";
-    };
   };
 }

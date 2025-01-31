@@ -51,18 +51,7 @@
     };
   };
 
-  networking.firewall.allowedTCPPorts = [
-    22    # SSH
-    9002  # Node exporter
-    2342  # Grafana
-    9090  # Prometheus
-    6443  # K3s
-
-    3000  # Front end
-    50051 # grpc client
-    3304  # MySQL db
-    33060 # MySQL db
-  ];
+  networking.firewall.enable = false;
 
   # Needed kernel parameters for running K3s
   # https://pet2cattle.com/2020/12/k3s-installation-raspberry
