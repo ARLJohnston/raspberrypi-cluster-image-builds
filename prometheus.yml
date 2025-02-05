@@ -3,16 +3,49 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: "prometheus"
+  - job_name: "node_exporter"
     metrics_path: /metrics
     static_configs:
-      - targets: [ "localhost:8080" ]
-    fallback_scrape_protocol: PrometheusText0.0.4
-    # metric_relabel_configs:
-    #   - source_labels: [ __name__ ]
-    #     regex: 'scaph_process_.*'
-    #     action: drop
-    metric_relabel_configs:
-      - source_labels: [__name__]
+      - targets:
+        - 10.0.0.21:9002 # Need replacement with sed
+        - 10.0.0.22:9002 # Need replacement with sed
+        - 10.0.0.23:9002 # Need replacement with sed
+        - 10.0.0.20:9002
+
+  - job_name: "internal"
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+        - localhost:9090 # Prometheus metrics
+        - localhost:3000 # Front end metrics
+        - localhost:2121 # Client metrics
+
+  - job_name: "docker"
+    dockerswarm_sd_configs:
+      - host: unix:///var/run/docker.sock
+        role: nodes
+    relabel_configs:
+      # Fetch metrics on port 9323.
+      - source_labels: [__meta_dockerswarm_node_address]
+        target_label: __address__
+        replacement: $1:9323
+      # Set hostname as instance label
+      - source_labels: [__meta_dockerswarm_node_hostname]
+        target_label: instance
+
+  - job_name: 'dockerswarm'
+    dockerswarm_sd_configs:
+      - host: unix:///var/run/docker.sock
+        role: tasks
+    relabel_configs:
+      # Only keep containers that should be running.
+      - source_labels: [__meta_dockerswarm_task_desired_state]
+        regex: running
         action: keep
-        regex: '(scaph_host_power_microwatts|scaph_host_energy_microjoules)'
+      # Only keep containers that have a `prometheus-job` label.
+      - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
+        regex: .+
+        action: keep
+      # Use the prometheus-job Swarm label as Prometheus job label.
+      - source_labels: [__meta_dockerswarm_service_label_prometheus_job]
+        target_label: job
