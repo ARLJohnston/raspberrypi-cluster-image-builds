@@ -67,10 +67,6 @@ in
     "cgroup_enable=memory"
   ];
 
-
-  networking.firewall.allowedUDPPorts = [
-    8472  # K3s, flannel: required if using multi-node for inter-node networking
-  ];
   nix.settings = {
     experimental-features = lib.mkDefault "nix-command flakes";
     trusted-users = [ "root" "@wheel" ];
