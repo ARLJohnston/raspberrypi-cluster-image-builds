@@ -1,19 +1,16 @@
 { pkgs, lib, ... }:
+let
+  host = "pi30";
+in
 {
   environment.systemPackages = with pkgs; [ git lsof networkmanager];
 
-  networking.hostName = "pi";
+  networking.hostName = host;
   users = {
-    users.pi = {
-      password = "password";
-      isNormalUser = true;
-      extraGroups = [ "wheel" ];
-      openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDvI8WT1wVlTtqheO4pS0zOInO9Da4V3BGeTOlTviCJx" ];
-    };
     users.root.openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDvI8WT1wVlTtqheO4pS0zOInO9Da4V3BGeTOlTviCJx" ];
     users.root.initialHashedPassword = "";
   };
-  services.getty.autologinUser = "pi";
+  services.getty.autologinUser = "root";
 
   security.sudo = {
     enable = true;
@@ -26,7 +23,7 @@
     interfaces."eth0" = {
       useDHCP = false;
       ipv4.addresses = [{
-        address = "10.0.0.20"; # Need to replace during build
+        address = "10.0.0.30"; # Gets replaced during build
         prefixLength = 24;
       }];
       ipv6.addresses = [];
