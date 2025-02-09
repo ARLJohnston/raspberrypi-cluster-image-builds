@@ -1,0 +1,26 @@
+groups:
+  - name: cpu_load
+    rules:
+    - record: device:cpu_load:average
+      expr: avg without (mode,cpu) (1 - rate(node_cpu_seconds_total{mode='idle', instance="localhost:9002"}[1m]))
+
+  - name: upload
+    rules:
+    - record: device:upload:rate1m
+      expr: rate(node_network_transmit_bytes_total{device="eth0", instance="localhost:9002"}[1m])/(1024*1024)
+
+  - name: download
+    rules:
+    - record: device:download:rate1m
+      expr: rate(node_network_receive_bytes_total{device="eth0", instance="localhost:9002"}[1m])/(1024*1024)
+
+  - name: power
+    rules:
+    - record: device:power_no_e:rate1m
+      expr: 1.3704+0.6191*device:cpu_load:average+0.000000003*(device:upload:rate1m^2)+0.357*0.05*device:upload:rate1m-4.33*0.002*device:download:rate1m^2+8.765*device:download:rate1m
+
+
+  - name: power2
+    rules:
+    - record: device:power_e:rate1m
+      expr: 1.3704 + 0.6191 * label_replace(device:cpu_load:average, "device", "wlp3s0", "", "") + 0.065 * (device:upload:rate1m ^ 2) + 0.357 * 0.05 * device:upload:rate1m - 4.33 * 0.002 * device:download:rate1m ^ 2 + 0.024 * device:download:rate1m
