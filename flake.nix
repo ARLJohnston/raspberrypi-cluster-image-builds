@@ -2,13 +2,8 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    nix-snapd ={
-      url = "github:nix-community/nix-snapd";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
   };
-  outputs = { self, nixpkgs, nix-snapd }@inputs: {
+  outputs = { self, nixpkgs }@inputs: {
     nixosConfigurations = {
       pi3 = nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
@@ -36,22 +31,45 @@
 
       pi3_kubernetes_worker = self.nixosConfigurations.pi3_docker_worker.extendModules {
         modules = [
-          nix-snapd.nixosModules.default
+        ./kubernetes.nix
+{
+  services.k3s = {
+    enable = true;
+    role = "agent";
+    token = "qR0Z[l,Dt80F$hJ38;Nhgk[!^[]_gb";
+    serverAddr = "https://10.0.0.40:6443";
+  };
+}
+
+        ];
+      };
+
+      pi3_kubernetes_supervisor = self.nixosConfigurations.pi3_docker_worker.extendModules {
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./supervisor.nix
+         ./kubernetes.nix
           {
-            services.snap.enable = true;
+            services.k3s = {
+              enable = true;
+              role = "server";
+              token = "qR0Z[l,Dt80F$hJ38;Nhgk[!^[]_gb";
+              clusterInit = true;
+            };
           }
         ];
       };
 
-      pi3_kubernetes_supervisor = self.nixosConfigurations.pi3_kubernetes_worker.extendModules {
-        specialArgs = {inherit inputs;};
+      pi3_servicemesh_worker = self.nixosConfigurations.pi3_kubernetes_worker.extendModules {
         modules = [
-          ./supervisor.nix
+          ./servicemesh.nix
         ];
       };
-
-      pi3_istio_worker = self.nixosConfigurations.pi3_kubernetes_worker;
-      pi3_istio_supervisor =  self.nixosConfigurations.pi3_kubernetes_supervisor;
+      pi3_servicemesh_supervisor =  self.nixosConfigurations.pi3_kubernetes_supervisor.extendModules {
+        modules = [
+          ./servicemesh.nix
+        ];
+      };
     };
   };
 }
