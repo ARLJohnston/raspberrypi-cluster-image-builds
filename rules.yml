@@ -2,25 +2,42 @@ groups:
   - name: cpu_load
     rules:
     - record: device:cpu_load:average
-      expr: avg without (mode,cpu) (1 - rate(node_cpu_seconds_total{mode='idle', instance="localhost:9002"}[1m]))
+      expr: avg without (mode,cpu) (1 - rate(node_cpu_seconds_total{mode='idle'}[1m]))
 
   - name: upload
     rules:
-    - record: device:upload:rate1m
-      expr: rate(node_network_transmit_bytes_total{device="eth0", instance="localhost:9002"}[1m])/(1024*1024)
+    - record: device:upload_eth:rate1m
+      expr: rate(node_network_transmit_bytes_total{device="eth0"}[1m])/(1024*1024)
+
+    - record: device:upload_wlan:rate1m
+      expr: rate(node_network_transmit_bytes_total{device="wlan0"}[1m])/(1024*1024)
+
+    - record: device:upload_eth:power_contribution
+      expr: 0.065 * (device:upload_eth:rate1m^2) + 0.357 * 0.05 * device:upload_eth:rate1m
+
+    - record: device:upload_wlan:power_contribution
+      expr: -0.0006 * (device:upload_wlan:rate1m^2) + 0.099*device:upload:wlan:rate1m -0.072
 
   - name: download
     rules:
-    - record: device:download:rate1m
-      expr: rate(node_network_receive_bytes_total{device="eth0", instance="localhost:9002"}[1m])/(1024*1024)
+    - record: device:download_eth:rate1m
+      expr: rate(node_network_receive_bytes_total{device="eth0"}[1m])/(1024*1024)
+
+    - record: device:download_wlan:rate1m
+      expr: rate(node_network_receive_bytes_total{device="wlan0"}[1m])/(1024*1024)
+
+    - record: device:download_eth:power_contribution
+      expr: -4.33 * 0.002 * device:download_eth:rate1m ^ 2 + 0.024 * device:download_eth:rate1m
+
+    - record: device:download_wlan:power_contribution
+      expr: 0.09 * (device:download_wlan:rate1m^2) -0.67*device:download_wlan:rate1m + 0.072
 
   - name: power
     rules:
-    - record: device:power_no_e:rate1m
-      expr: 1.3704+0.6191*device:cpu_load:average+0.000000003*(device:upload:rate1m^2)+0.357*0.05*device:upload:rate1m-4.33*0.002*device:download:rate1m^2+8.765*device:download:rate1m
+    - record: device:power:rate1m
+      expr:
+        1.3704 + sum({__name__=~"device:cpu_load:average|device:download_eth:power_contribution|device:upload_eth:power_contribution|device:download_wlan:power_contribution|device:upload_wlan:power_contribution"}) by (instance)
 
-
-  - name: power2
-    rules:
-    - record: device:power_e:rate1m
-      expr: 1.3704 + 0.6191 * label_replace(device:cpu_load:average, "device", "wlp3s0", "", "") + 0.065 * (device:upload:rate1m ^ 2) + 0.357 * 0.05 * device:upload:rate1m - 4.33 * 0.002 * device:download:rate1m ^ 2 + 0.024 * device:download:rate1m
+    - record: cluster:power:total
+      expr:
+        sum(device:power:rate1m)

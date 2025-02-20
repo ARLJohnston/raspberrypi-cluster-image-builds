@@ -3,7 +3,7 @@ let
   host = "pi30";
 in
 {
-  environment.systemPackages = with pkgs; [ git lsof networkmanager];
+  environment.systemPackages = with pkgs; [ git lsof];
 
   networking.hostName = host;
   users = {
@@ -61,11 +61,16 @@ in
 
   # Needed kernel parameters for running K3s
   # https://pet2cattle.com/2020/12/k3s-installation-raspberry
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/applications/networking/cluster/k3s/docs/CLUSTER_UPKEEP.md
   boot.kernelParams = [
     "cgroup_enable=cpuset"
     "cgroup_memory=1"
     "cgroup_enable=memory"
   ];
+  boot.kernel.sysctl = {
+    "net.ipv6.conf.all.disable_ipv6" = 1;
+    "net.ipv6.conf.default.disable_ipv6" = 1;
+  };
 
   nix.settings = {
     experimental-features = lib.mkDefault "nix-command flakes";
