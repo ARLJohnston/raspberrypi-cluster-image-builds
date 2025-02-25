@@ -36,8 +36,8 @@ groups:
     rules:
     - record: device:power:rate1m
       expr:
-        1.3704 + sum({__name__=~"device:cpu_load:average|device:download_eth:power_contribution|device:upload_eth:power_contribution|device:download_wlan:power_contribution|device:upload_wlan:power_contribution"}) by (instance)
+        1.3704 + sum({__name__=~"device:cpu_load:average|device:download_eth:power_contribution|device:upload_eth:power_contribution|device:download_wlan:power_contribution|device:upload_wlan:power_contribution"}) by (instance, type)
 
     - record: cluster:power:total
       expr:
-        sum(device:power:rate1m)
+        sum(device:power:rate1m) by (type)
