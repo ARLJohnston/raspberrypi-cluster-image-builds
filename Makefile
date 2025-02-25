@@ -41,3 +41,5 @@ servicemesh-images:
 	$(call build_image,pi3_servicemesh_worker,41)
 	$(call build_image,pi3_servicemesh_worker,42)
 	$(call build_image,pi3_servicemesh_worker,43)
+
+all: docker-images kubernetes-image servicemesh-images
