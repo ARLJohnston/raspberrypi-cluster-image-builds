@@ -32,15 +32,15 @@
       pi3_kubernetes_worker = self.nixosConfigurations.pi3_docker_worker.extendModules {
         modules = [
         ./kubernetes.nix
-{
-  services.k3s = {
-    enable = true;
-    role = "agent";
-    token = "qR0Z[l,Dt80F$hJ38;Nhgk[!^[]_gb";
-    serverAddr = "https://10.0.0.40:6443";
-  };
-}
-
+        {
+          services.k3s = {
+            enable = true;
+            role = "agent";
+            token = "qR0Z[l,Dt80F$hJ38;Nhgk[!^[]_gb";
+            serverAddr = "https://10.0.0.40:6443";
+            extraFlags = ["--disable=traefik"];
+          };
+        }
         ];
       };
 
@@ -55,6 +55,7 @@
               role = "server";
               token = "qR0Z[l,Dt80F$hJ38;Nhgk[!^[]_gb";
               clusterInit = true;
+              extraFlags = ["--disable=traefik"];
             };
           }
         ];
