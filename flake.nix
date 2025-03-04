@@ -38,7 +38,6 @@
             role = "agent";
             token = "qR0Z[l,Dt80F$hJ38;Nhgk[!^[]_gb";
             serverAddr = "https://10.0.0.40:6443";
-            extraFlags = ["--disable=traefik"];
           };
         }
         ];
